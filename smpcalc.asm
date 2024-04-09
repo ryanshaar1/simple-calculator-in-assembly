@@ -55,20 +55,33 @@ addition:
     jmp calculate
 
 subtraction:
+    mov bl, cl
     sub cl, al;להשתמש בנג וכנראה להוסיף תנאי כי רוצים להשתמש בנג רק אם תוצאת החיסור היא שלילית
+    cmp bl, al
+    jns calculate
+    mov bl, cl
+    neg cl
+
 
 calculate:
-    ; Convert result to ASCII
-    add cl, '0' ; Convert integer to ASCII
-
-    ; Store result in buffer
-    mov result, cl
-
     ; Print result
     mov ah, 09h
     lea dx, msg_result
     int 21h
+    ; Convert result to ASCII
+    test bl, bl
+    jns positive
+    mov dl, '-'       ; Load '-' character into dl
+    mov ah, 02h       ; Set AH to 02h for character output
+    int 21h           ; Print '-'
 
+
+
+positive:
+    add cl, '0' ; Convert integer to ASCII
+
+    ; Store result in buffer
+    mov result, cl
     mov dl, result
     mov ah, 02h
     int 21h
